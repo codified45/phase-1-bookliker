@@ -37,10 +37,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 li.textContent = user.username;
                 usersThatHaveLiked.appendChild(li);
             };
-            showPanel.replaceChildren(thumbnail, description, usersThatHaveLiked); // put elements here
+            let likeBtn = document.createElement('button');
+            likeBtn.textContent = 'Like';
+            likeBtn.id = obj.id;
+            likeBtn.addEventListener('click', likeBtnClickHandler);
+            showPanel.replaceChildren(thumbnail, description, usersThatHaveLiked, likeBtn); // put elements here
         });
     };
 
+    function likeBtnClickHandler(e) {
+        console.log(e.target.id);
+    };
 });
 
 
