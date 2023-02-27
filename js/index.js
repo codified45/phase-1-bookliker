@@ -1,19 +1,45 @@
 document.addEventListener("DOMContentLoaded", function() {
     const booksUrl = 'http://localhost:3000/books';
     const list = document.getElementById('list');
+    const showPanel = document.getElementById('show-panel');
+    fetchBooks();
+    
 
-    fetch(booksUrl)
-    .then(res => res.json())
-    .then(obj => {
-        console.log(obj);
-        for (const element of obj) {
-        const li = document.createElement('li');
-        li.textContent = element.title;
-        // li.addEventListener('click', )
-        list.appendChild(li);
-        }
-    });
+    function fetchBooks() {
+        fetch(booksUrl)
+        .then(res => res.json())
+        .then(obj => {
+            console.log(obj);
+            for (const element of obj) {
+            const li = document.createElement('li');
+            li.textContent = element.title;
+            li.id = element.id;
+            li.addEventListener('click', showBookPanel);
+            list.appendChild(li);
+            };
+        });
+    };
 
+    function showBookPanel(e) {
+        console.log('I\'m in showbookpanel');
+        bookUrl = booksUrl + `/${e.target.id}`;
+        fetch(bookUrl)
+        .then(res => res.json())
+        .then(obj =>{
+            console.log(obj.author);
+            let thumbnail = document.createElement('img');
+            thumbnail.src = obj.img_url;
+            let description = document.createElement('p');
+            description.textContent = obj.description;
+            let usersThatHaveLiked = document.createElement('ul');
+            for (const user of obj.users) {
+                let li = document.createElement('li');
+                li.textContent = user.username;
+                usersThatHaveLiked.appendChild(li);
+            };
+            showPanel.replaceChildren(thumbnail, description, usersThatHaveLiked); // put elements here
+        });
+    };
 
 });
 
