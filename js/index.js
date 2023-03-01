@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function showBookPanel(e) {
         console.log('I\'m in showbookpanel');
         let bookUrl = booksUrl + `/${e.target.id}`;
+        console.log(bookUrl);
         fetch(bookUrl)
         .then(res => res.json())
         .then(obj =>{
@@ -41,44 +42,64 @@ document.addEventListener("DOMContentLoaded", function() {
             likeBtn.textContent = 'Like';
             likeBtn.id = obj.id;
             likeBtn.addEventListener('click', likeBtnClickHandler);
-            showPanel.replaceChildren(thumbnail, description, usersThatHaveLiked, likeBtn); // put elements here
+            showPanel.replaceChildren(thumbnail, description, usersThatHaveLiked, likeBtn);
         });
     };
 
     function likeBtnClickHandler(e) {
         console.log(e.target.id);
-        let bookUrl = booksUrl + `/${e.target.id}`;
-        fetch(bookUrl)
+        let updatingBookLikesUrl = booksUrl + `/${e.target.id}`;
+        console.log(updatingBookLikesUrl);
+        fetch(updatingBookLikesUrl)
         .then(res => res.json())
         .then(obj => {
             console.log(obj);
-            let existingLikes = obj.users;
-            console.log(existingLikes);
+            let users = obj.users;
+            console.log(users);
             let newUserLike = {
-                username: "hunter45",
+                id: 7,
+                username: "summerqueen98",
             };
 
-            existingLikes.push(newUserLike);
-            console.log(existingLikes);
+            users.push(newUserLike);
+            console.log(users);
+            console.log(JSON.stringify(users));
 
-            // existingLikes.push() // push the new user object created
-            // for (const user of obj.users) {
+            let patchConfig = {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({
+                    "users": users,
+                }),
+            };
+            
+            // body: { "users": 
+            //             JSON.stringify(users),
+            //     },
 
-            // };
 
-            // let userLikeData = {
-
-            // };
-        
             // let patchConfig = {
             //     method: "PATCH",
             //     headers: {
             //         "Content-Type": "application/json",
-            //         "Application": "application/json",
+            //         "Accept": "application/json",
             //     },
-            //     body: JSON.stringify(userLikeData),
+            //     body: {
+            //         "users":
+            //             JSON.stringify(users),
+            //     },
             // };
 
+            console.log(patchConfig);
+            console.log(updatingBookLikesUrl);
+            fetch(updatingBookLikesUrl, patchConfig)
+            .then(res => res.json())
+            .then(obj => {
+                console.log(obj);
+            });
         });
     };
 
