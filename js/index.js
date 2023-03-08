@@ -76,31 +76,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 }),
             };
             
-            // body: { "users": 
-            //             JSON.stringify(users),
-            //     },
-
-
-            // let patchConfig = {
-            //     method: "PATCH",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //         "Accept": "application/json",
-            //     },
-            //     body: {
-            //         "users":
-            //             JSON.stringify(users),
-            //     },
-            // };
-
             console.log(patchConfig);
             console.log(updatingBookLikesUrl);
             fetch(updatingBookLikesUrl, patchConfig)
             .then(res => res.json())
             .then(obj => {
                 console.log(obj);
+                let id = e.target.id;
+                // let button = document.querySelector(`button#${id}`);
+                // console.log(button);
+                let li = document.createElement('li');
+                console.log(obj.users[e.target.id]);// here
+                li.textContent = obj.username;
+                let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
+                console.log(document.querySelector("#show-panel ul"));
+                let usersThatHaveLiked = document.createElement('ul');
+                for (const user of obj.users) {
+                    let li = document.createElement('li');
+                    li.textContent = user.username;
+                    usersThatHaveLiked.appendChild(li);
+                };
+                oldUsersThatHaveLiked.replaceWith(usersThatHaveLiked);
             });
         });
+        
     };
 
 });
