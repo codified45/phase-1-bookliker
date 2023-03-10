@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const list = document.getElementById('list');
     const showPanel = document.getElementById('show-panel');
     fetchBooks();
-    
+
 
     function fetchBooks() {
         fetch(booksUrl)
@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     function showBookPanel(e) {
-        console.log('I\'m in showbookpanel');
         let bookUrl = booksUrl + `/${e.target.id}`;
         console.log(bookUrl);
         fetch(bookUrl)
@@ -51,35 +50,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function likeBtnClickHandler(e) {
         doesUserLikeExist(e);
-        // console.log(likeExists);
-        isUserLikeInDom();
+        //isUserLikeInDom(); //don't need this, was only being used during troubleshooting. 
         console.log(doesUserLikeExist(e));
-        // let addLike = doesUserLikeExist(e);
-        // console.log(addLike);
-        // if (!addLike) {console.log('we are adding');
-        //     addUserLike(e);
-        // } else if (addLike) {console.log('we are removing')
-        //     removeUserLike(e);
-        // };
-
-        // .then(console.log('hey progress'));
-
-        // if (doesUserLikeExist(e)){
-        //     removeUserLike(e);
-        // } else {addUserLike(e)};
     };
 
-    function isUserLikeInDom() {
-        let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
-        let domUserLikeNodes = oldUsersThatHaveLiked.childNodes;
-        console.log(domUserLikeNodes);
-        for (const node of domUserLikeNodes) {
-            console.log(node.textContent);
-            if (node.textContent === "summerqueen98") {
-                node.remove();
-            };
-        };
-    };
+    // function isUserLikeInDom() {
+    //     let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
+    //     let domUserLikeNodes = oldUsersThatHaveLiked.childNodes;
+    //     console.log(domUserLikeNodes);
+    //     for (const node of domUserLikeNodes) {
+    //         console.log(node.textContent);
+    //         if (node.textContent === "summerqueen98") {
+    //             node.remove();
+    //         };
+    //     };
+    // };
     
     function doesUserLikeExist(e) {
         likeExists = false; // has to reset otherwise will stay true forever after initial flip.  
@@ -94,15 +79,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (user.id === 7) {likeExists = true};
                 console.log(likeExists);
             });
-            console.log(`this is inside before I return likeExists, which is ${likeExists}`);
         })
         .then( () => { 
-            if (likeExists) {console.log(event); 
-                console.log('adding');
-                removeUserLike(event);
-            } else {console.log('hey man watsup');
-                console.log('removing');
-                addUserLike(event);
+            if (likeExists) {removeUserLike(event);
+            } else {addUserLike(event);
             };
         });
     };
@@ -112,7 +92,6 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(updatingBookLikesUrl)
         .then(res => res.json())
         .then(obj => {
-            console.log(obj);
             let users = obj.users;
             console.log(users);
             let newUserLike = {
@@ -139,9 +118,8 @@ document.addEventListener("DOMContentLoaded", function() {
             fetch(updatingBookLikesUrl, patchConfig)
             .then(res => res.json())
             .then(obj => {
-                console.log(obj);
                 let li = document.createElement('li');
-                console.log(obj.users[e.target.id]);
+                console.log(obj.users[e.target.id]); //don't know why this was giving me a weird result. 
                 li.textContent = obj.username;
                 let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
                 console.log(document.querySelector("#show-panel ul"));
@@ -161,9 +139,7 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(updatingBookLikesUrl)
         .then(res => res.json())
         .then(obj => {
-            console.log(obj);
             let users = obj.users;
-            console.log(users);
     
             let existingUserLike = {
                 id: 7,
@@ -191,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function() {
             fetch(updatingBookLikesUrl, patchConfig)
             .then(res => res.json())
             .then(obj => {
-                console.log(obj);
                 let li = document.createElement('li');
                 console.log(obj.users[e.target.id]);
                 li.textContent = obj.username;
@@ -208,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     };
 });
-
 
 
 /*
