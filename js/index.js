@@ -1,3 +1,6 @@
+
+let likeExists;
+
 document.addEventListener("DOMContentLoaded", function() {
     const booksUrl = 'http://localhost:3000/books';
     const list = document.getElementById('list');
@@ -47,9 +50,65 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     function likeBtnClickHandler(e) {
-        console.log(e.target.id);
+        doesUserLikeExist(e);
+        // console.log(likeExists);
+        isUserLikeInDom();
+        console.log(doesUserLikeExist(e));
+        // let addLike = doesUserLikeExist(e);
+        // console.log(addLike);
+        // if (!addLike) {console.log('we are adding');
+        //     addUserLike(e);
+        // } else if (addLike) {console.log('we are removing')
+        //     removeUserLike(e);
+        // };
+
+        // .then(console.log('hey progress'));
+
+        // if (doesUserLikeExist(e)){
+        //     removeUserLike(e);
+        // } else {addUserLike(e)};
+    };
+
+    function isUserLikeInDom() {
+        let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
+        let domUserLikeNodes = oldUsersThatHaveLiked.childNodes;
+        console.log(domUserLikeNodes);
+        for (const node of domUserLikeNodes) {
+            console.log(node.textContent);
+            if (node.textContent === "summerqueen98") {
+                node.remove();
+            };
+        };
+    };
+    
+    function doesUserLikeExist(e) {
+        likeExists = false; // has to reset otherwise will stay true forever after initial flip.  
+        let event = e;
+        let checkingBookLikesUrl = booksUrl + `/${e.target.id}`;
+        fetch(checkingBookLikesUrl)
+        .then(res => res.json())
+        .then(obj => {
+            console.log(obj.users);
+            obj.users.forEach(user => {
+                console.log(user.id);
+                if (user.id === 7) {likeExists = true};
+                console.log(likeExists);
+            });
+            console.log(`this is inside before I return likeExists, which is ${likeExists}`);
+        })
+        .then( () => { 
+            if (likeExists) {console.log(event); 
+                console.log('adding');
+                removeUserLike(event);
+            } else {console.log('hey man watsup');
+                console.log('removing');
+                addUserLike(event);
+            };
+        });
+    };
+    
+    function addUserLike(e) {
         let updatingBookLikesUrl = booksUrl + `/${e.target.id}`;
-        console.log(updatingBookLikesUrl);
         fetch(updatingBookLikesUrl)
         .then(res => res.json())
         .then(obj => {
@@ -60,11 +119,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 id: 7,
                 username: "summerqueen98",
             };
-
+    
             users.push(newUserLike);
+            likeExists = true;
             console.log(users);
             console.log(JSON.stringify(users));
-
+    
             let patchConfig = {
                 method: "PATCH",
                 headers: {
@@ -75,18 +135,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     "users": users,
                 }),
             };
-            
-            console.log(patchConfig);
-            console.log(updatingBookLikesUrl);
+    
             fetch(updatingBookLikesUrl, patchConfig)
             .then(res => res.json())
             .then(obj => {
                 console.log(obj);
-                let id = e.target.id;
-                // let button = document.querySelector(`button#${id}`);
-                // console.log(button);
                 let li = document.createElement('li');
-                console.log(obj.users[e.target.id]);// here
+                console.log(obj.users[e.target.id]);
                 li.textContent = obj.username;
                 let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
                 console.log(document.querySelector("#show-panel ul"));
@@ -99,10 +154,61 @@ document.addEventListener("DOMContentLoaded", function() {
                 oldUsersThatHaveLiked.replaceWith(usersThatHaveLiked);
             });
         });
-        
     };
-
+    
+    function removeUserLike(e) {
+        let updatingBookLikesUrl = booksUrl + `/${e.target.id}`;
+        fetch(updatingBookLikesUrl)
+        .then(res => res.json())
+        .then(obj => {
+            console.log(obj);
+            let users = obj.users;
+            console.log(users);
+    
+            let existingUserLike = {
+                id: 7,
+                username: "summerqueen98",
+            };
+    
+            let removeThisIndex = users.indexOf(existingUserLike);
+            console.log(users.indexOf(existingUserLike));
+            console.log(users);
+            users.splice(removeThisIndex, 1);
+            console.log(users);
+            console.log(JSON.stringify(users));
+    
+            let patchConfig = {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({
+                    "users": users,
+                }),
+            };
+    
+            fetch(updatingBookLikesUrl, patchConfig)
+            .then(res => res.json())
+            .then(obj => {
+                console.log(obj);
+                let li = document.createElement('li');
+                console.log(obj.users[e.target.id]);
+                li.textContent = obj.username;
+                let oldUsersThatHaveLiked = document.querySelector("#show-panel ul");
+                console.log(document.querySelector("#show-panel ul"));
+                let usersThatHaveLiked = document.createElement('ul');
+                for (const user of obj.users) {
+                    let li = document.createElement('li');
+                    li.textContent = user.username;
+                    usersThatHaveLiked.appendChild(li);
+                };
+                oldUsersThatHaveLiked.replaceWith(usersThatHaveLiked);
+            });
+        });
+    };
 });
+
 
 
 /*
@@ -116,8 +222,9 @@ Show Details
 2. (done) When a user clicks the title of a book, display the book's thumbnail, description, and a list of users who have liked the book. This information should be displayed in the div#show-panel element.
 
 Like a Book
-A user can like a book by clicking on a button. 3. (done) Display a LIKE button along with the book details. 
-When the button is clicked, send a PATCH request to http://localhost:3000/books/:id with an array of users who like the book, and add a new user to the list.
+A user can like a book by clicking on a button. 
+3. (done) Display a LIKE button along with the book details. 
+4. (done) When the button is clicked, send a PATCH request to http://localhost:3000/books/:id with an array of users who like the book, and add a new user to the list.
 
 For example, if you are user 1 {"id":1, "username":"pouros"} and the previous array was "[{"id":2, "username":"auer"}, {"id":8, "username":"maverick"}], you should send as the body of your PATCH request:
 
@@ -128,11 +235,13 @@ For example, if you are user 1 {"id":1, "username":"pouros"} and the previous ar
     { "id": 1, "username": "pouros" }
   ]
 }
-After clicking the like button, the user's name should also be displayed along with the list of users who have liked the book in the book details section.
+
+5. (done) After clicking the like button, the user's name should also be displayed along with the list of users who have liked the book in the book details section.
 
 Bonus: Un-Like a Book
-If a user has already liked a book, clicking the LIKE button a second time should remove that user from the list of users who have liked the book.
+6. (done) If a user has already liked a book, clicking the LIKE button a second time should remove that user from the list of users who have liked the book.
 
-Make a second PATCH request with the updated array of users, removing your user from the list. Also remove the user from the DOM.
+7. (done) Make a second PATCH request with the updated array of users, removing your user from the list. 
+8. (done) Also remove the user from the DOM.
 
 */
